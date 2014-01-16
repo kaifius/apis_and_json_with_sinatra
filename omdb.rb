@@ -20,7 +20,7 @@ post '/result' do
 
   # Make a request to the omdb api here!
   response = Typhoeus.get("www.omdbapi.com", :params => {s: search_str})
-  movies = JSON.parse(response.body)["Search"].sort_by { |x| x["Year"]}.reverse
+  movies = JSON.parse(response.body)["Search"]
 
 
 
@@ -28,9 +28,10 @@ post '/result' do
   # Modify the html output so that a list of movies is provided.
   html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
   if movies.nil?
-    html_str +=  "That movie doesn't exist!"
+    html_str +=  "<h2>That movie doesn't exist!</h2> <img src = 'http://i.imgur.com/QCY6iG5.jpg' /> "
   else
-    movies.each do |x|
+    sorted_movies = movies.sort_by { |x| x["Year"]}.reverse
+    sorted_movies.each do |x|
       html_str += "<li><a href=poster/#{x['imdbID']}>#{x["Title"]}, #{x["Year"]}</a></li>"
     end
   end
@@ -52,7 +53,7 @@ get '/poster/:imdb' do |imdb_id|
 
   html_str = "<html><head><title>Movie Poster</title></head><body><h1>Movie Poster</h1>\n"
   html_str += "<h3>#{poster["Title"]}</h3>"
-  html_str += "<img src=#{poster["Poster"]} alt = 'Movie Poster Image' >"
+  html_str += "<object data=#{poster["Poster"]}><img src='http://i.imgur.com/QCY6iG5.jpg' alt = 'Movie Poster Image' ></object>"
   html_str += '<br /><a href="/">New Search</a></body></html>'
 
 end
